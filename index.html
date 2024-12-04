@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relazioni di Laboratorio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #007acc;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            margin: 10px 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007acc;
+        }
+
+        a:hover {
+            color: #005f99;
+        }
+
+        #binario {
+            position: relative;
+            width: 500px;
+            height: 50px;
+            background-color: #ddd;
+            margin: 20px auto;
+            border: 1px solid #999;
+        }
+
+        #quadrato {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            top: 10px;
+        }
+
+        #fotocellula {
+            position: absolute;
+            width: 2px; /* Linea sottile */
+            height: 50px; /* Altezza del binario */
+            background-color: black;
+        }
+
+        #metro, #cronometro {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Relazioni di Laboratorio</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Seleziona una Relazione</h2>
+            <ul>
+                <li><a href="#">Relazione 1: Moto Rettilineo Uniformemente Accelerato</a></li>
+                <li><a href="#">Relazione 2: Studio della Caduta Libera</a></li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Prove Pratiche</h2>
+            <ul>
+                <li><a href="javascript:calcolaMRUA()">Prova 1: Moto Rettilineo Uniformemente Accelerato</a></li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Simulazione Movimento</h2>
+            <label for="posizioneFotocellula">Distanza Fotocellula (px):</label>
+            <input type="number" id="posizioneFotocellula" value="450" min="0" max="500">
+            <div id="binario">
+                <div id="quadrato"></div>
+                <div id="fotocellula"></div>
+            </div>
+            <div id="metro">Distanza percorsa: <span id="distanza">0</span> px</div>
+            <div id="cronometro">Tempo: <span id="tempo">0.00</span> s</div>
+            <button id="start">Inizia</button>
+        </section>
+    </main>
+    <footer>
+        <p>Progetto creato da Sicali Riccardo, Juanbautista Dinaccio, Luca FROCIO</p>
+    </footer>
+    <script>
+        const quadrato = document.getElementById('quadrato');
+        const fotocellula = document.getElementById('fotocellula');
+        const distanzaSpan = document.getElementById('distanza');
+        const tempoSpan = document.getElementById('tempo');
+        const startButton = document.getElementById('start');
+        const posizioneFotocellulaInput = document.getElementById('posizioneFotocellula');
+
+        let posizione = 0; // Posizione iniziale del quadrato
+        let intervallo; // Per gestire l'animazione
+        let tempo = 0; // Tempo trascorso
+        let cronometro; // Per il timer
+
+        function aggiornaFotocellula() {
+            const distanzaFotocellula = parseInt(posizioneFotocellulaInput.value, 10);
+            fotocellula.style.left = distanzaFotocellula + 'px';
+        }
+
+        function startAnimazione() {
+            posizione = 0;
+            tempo = 0;
+            quadrato.style.left = '0px';
+            distanzaSpan.textContent = '0';
+            tempoSpan.textContent = '0.00';
+
+            // Posiziona la fotocellula prima di avviare l'animazione
+            aggiornaFotocellula();
+
+            const distanzaFotocellula = parseInt(posizioneFotocellulaInput.value, 10);
+
+            // Avvia il cronometro
+            cronometro = setInterval(() => {
+                tempo += 0.01;
+                tempoSpan.textContent = tempo.toFixed(2);
+            }, 10);
+
+            // Avvia l'animazione
+            intervallo = setInterval(() => {
+                const larghezzaQuadrato = quadrato.offsetWidth;
+                const nuovaPosizione = posizione + 2; // Calcolo della prossima posizione
+
+                // Controlla se la prossima posizione supererebbe la fotocellula
+                if (nuovaPosizione + larghezzaQuadrato >= distanzaFotocellula) {
+                    posizione = distanzaFotocellula - larghezzaQuadrato; // Ferma il quadrato esattamente alla distanza
+                    quadrato.style.left = posizione + 'px';
+                    distanzaSpan.textContent = distanzaFotocellula; // Mostra la distanza corretta
+                    clearInterval(intervallo); // Ferma l'animazione
+                    clearInterval(cronometro); // Ferma il cronometro
+                } else {
+                    posizione = nuovaPosizione; // Aggiorna la posizione
+                    quadrato.style.left = posizione + 'px';
+                    distanzaSpan.textContent = posizione; // Mostra la posizione attuale
+                }
+            }, 10);
+        }
+
+        // Aggiorna la posizione della fotocellula in tempo reale
+        posizioneFotocellulaInput.addEventListener('input', aggiornaFotocellula);
+
+        // Avvia l'animazione al clic del pulsante
+        startButton.addEventListener('click', startAnimazione);
+
+        function calcolaMRUA() {
+            const accelerazione = parseFloat(prompt("Inserisci l'accelerazione (m/s²):"));
+            const tempo = parseFloat(prompt("Inserisci il tempo (s):"));
+            const distanza = 0.5 * accelerazione * Math.pow(tempo, 2);
+            alert(`La distanza percorsa è: ${distanza.toFixed(2)} metri`);
+        }
+    </script>
+</body>
+</html>
